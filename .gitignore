@@ -1,0 +1,7 @@
+*
+!.gitignore
+!.gitmodules
+!*.py
+!LICENSE
+!README.md
+!pybmp
