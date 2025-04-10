@@ -1,0 +1,3 @@
+[submodule "pybmp"]
+	path = pybmp
+	url = https://github.com/thatcppnerd/pybmp

@@ -4,8 +4,11 @@ import os
 import struct as st
 import argparse as ap
 
-from pybmp import *
+import pybmp as pb
 
+import mmap as mp
+
+from ctypes import pointer as ptr
 
 
 input_path: str
@@ -41,6 +44,7 @@ def init():
 
     __p.add_argument('-i', '--input', type=str, help="Path of the input .bmp file.")
     __p.add_argument('-o', '--output', type=str, help='Path of the generated .bin file. If not specified, then the output file will take the name of the input file with .bin appended to it.')
+    
     __p.add_argument('-v', '--verbose', action='store_true')
     __p.add_argument('-hr', '--horizontal-reverse', action='store_true', help='Reverse the order of pixel rows in the output file.')
     __p.add_argument('-vr', '--vertical-reverse', action='store_true', help='Reverse the order of pixel columns in the output file.')
@@ -76,8 +80,7 @@ def init():
     vert_rev = args.vertical_reverse
     verbose = args.verbose
 
-
-
+    return
 
 
 def main():
@@ -91,6 +94,7 @@ def main():
     init()
 
     # print parameters
+    vprint("====================================================")
     vprint(f"Input file: {input_path}")
     vprint(f"Output file: {output_path}", end="")
 
@@ -113,16 +117,44 @@ def main():
     else:
         vprint("disabled")
 
-    vprint(f"Opening {input_path}... ", end="")    
-    input_file = open(input_path, mode="rb")
+    vprint("====================================================")
+
+    vprint(f"Opening input file \"{input_path}\"... ", end="")    
+    input_file = open(input_path, "rb")
     vprint("Done")
 
-    vprint(f"Reading... ", end="")
-    input_data 
-
-    vprint(f"Opening {output_path}... ", end="")
-    output_file = open(output_path, "xb")
+    vprint(f"Opening output file \"{output_path}\"... ", end="")
+    output_file = open(output_path, "wb")
     vprint("Done")
+
+    vprint(f"Mapping input file... ", end="")
+    input_map = mp.mmap(fileno=input_file.fileno(), length=0, prot=mp.PROT_READ)
+    vprint("Done")
+
+    # check if bmp header is ok
+    vprint(f"Reading input file header... ", end="")
+    input_file_header = pb.bmp_file_header.from_buffer_copy(input_map[:14])
+
+    if str(input_file_header.signature) != 'BM':
+        vprint("ERROR")
+        vprint(f"Tried to read \"BM\" signature, got \"{input_map[:2].decode()}\" instead")
+        exit(1)
+    
+
+    vprint("Done")
+
+
+
+
+
+
+
+
+
+    # input_map.__len__()
+
+
+
 
 
 
